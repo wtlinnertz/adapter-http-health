@@ -50,18 +50,16 @@ jobs:
 
       - name: Install adapter
         run: pip install -e adapter
-      - name: Install pytest-cov
-        run: pip install pytest-cov
 
       - name: Run conformance
         id: conformance
         continue-on-error: true
         uses: wtlinnertz/aieos-governance-foundation/.github/actions/run-conformance@main
         with:
-          adapter-id: adapter-pytest-unit
+          adapter-id: adapter-http-health
           adapter-version: "1.0.0"
-          python-import: "from aieos_adapter_pytest_unit import PytestUnitAdapter as AdapterClass"
-          suite-name: test.unit-suite
+          python-import: "from aieos_adapter_http_health import HttpHealthAdapter as AdapterClass"
+          suite-name: verify.health-suite
           signing-identity: "https://github.com/${{ github.repository }}/.github/workflows/ci.yml@refs/heads/main"
           output-path: attestation.json
 
