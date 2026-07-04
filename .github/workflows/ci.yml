@@ -51,9 +51,16 @@ jobs:
       - name: Install adapter
         run: pip install -e adapter
 
+      - name: Start health fixture server
+        run: |
+          mkdir -p /tmp/health-fixture && (cd /tmp/health-fixture && touch healthz readyz)
+          nohup python3 -m http.server 8080 --bind 127.0.0.1 --directory /tmp/health-fixture > /tmp/health-srv.log 2>&1 &
+          echo "AIEOS_FIXTURE_HEALTH_URL=http://127.0.0.1:8080" >> "$GITHUB_ENV"
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:8080/healthz >/dev/null 2>&1 && break || sleep 0.3; done
+          echo "health fixture server ready"
+
       - name: Run conformance
         id: conformance
-        continue-on-error: true
         uses: wtlinnertz/aieos-governance-foundation/.github/actions/run-conformance@main
         with:
           adapter-id: adapter-http-health
